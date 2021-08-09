@@ -4,6 +4,7 @@ const hapi = require('@hapi/hapi')
 const handlebars = require('handlebars')
 const inert = require('@hapi/inert')
 const path = require('path')
+const routes = require('./routes')
 const vision = require('@hapi/vision')
 
 const server = hapi.server({
@@ -18,8 +19,8 @@ const server = hapi.server({
 
 async function init () {
     try {
-        await server.register(inert);
-        await server.register(vision);
+        await server.register(inert)
+        await server.register(vision)
 
         server.views({
             engines: {
@@ -30,33 +31,13 @@ async function init () {
             layout: true,
             layoutPath: 'views'
         })
-        server.route({
-            method: 'GET',
-            path: '/',
-            handler: (req, h) => {
-                return h.view('index', {
-                    title: 'home'
-                })
-            }
-        })
-
-        server.route({
-            method: 'GET',
-            path: '/{param*}',
-            handler: {
-                directory: {
-                    path: '.',
-                    index: ['index.html']
-                }
-            }
-        })
-
-         await server.start();
+        server.route(routes)
+        await server.start()
     } catch (error) {
-        console.error(error);
-        process.exit(1);
+        console.error(error)
+        process.exit(1)
     }
-    console.log(`Servidor lanzado en ${server.info.uri}`);
+    console.log(`Servidor ejecutandose en ${server.info.uri}`)
 }
 
 init()
