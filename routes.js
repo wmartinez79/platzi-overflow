@@ -10,6 +10,12 @@ module.exports =
     {
         method: 'GET',
         path: '/',
+        options: {
+            cache: {
+                expiresIn: 1000 * 30,
+                privacy: 'private'
+            }
+        },
         handler: site.home
     },
     {
@@ -21,6 +27,11 @@ module.exports =
         method: 'GET',
         path: '/login',
         handler: site.login
+    },
+    {
+        method: 'GET',
+        path: '/question/{id}',
+        handler: site.viewQuestion
     },
     {
         method: 'GET',
@@ -74,6 +85,25 @@ module.exports =
             }  
         },
         handler: question.createQuestion
+    },
+    {
+        method: 'POST',
+        path: '/answer-question',
+        options: {
+            validate: {
+                payload: Joi.object({
+                    answer: Joi.string().required(),
+                    id: Joi.string().required()
+                }),
+                failAction: user.failValidation
+            }  
+        },
+        handler: question.answerQuestion
+    },
+    {
+        method: 'GET',
+        path: '/answer/{questionId}/{answerId}',
+        handler: question.setAnswerRight
     },
     {
         method: 'GET',

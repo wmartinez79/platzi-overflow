@@ -4,7 +4,7 @@
   "description": "Un sitio como StackOVerFlow",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --ext js,hbs",
+    "dev": "nodemon --ext js,hbs --trace-warnings",
     "lint": "standard",
     "lint-fix": "standard --fix",
     "test": "echo \"Error: no test specified\" && exit 1"

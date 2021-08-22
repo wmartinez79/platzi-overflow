@@ -1,8 +1,9 @@
 'use strict'
 
 const hapi = require('@hapi/hapi')
-const handlebars = require('handlebars')
+const handlebars = require('./lib/helpers')
 const inert = require('@hapi/inert')
+const methods = require('./lib/methods')
 const path = require('path')
 const routes = require('./routes')
 const vision = require('@hapi/vision')
@@ -23,6 +24,14 @@ async function init () {
         await server.register(inert)
         await server.register(vision)
 
+        server.method('setAnswerRight', methods.setAnswerRight)
+        server.method('getLast', methods.getLast, {
+            cache: {
+                expiresIn: 1000 * 60,
+                generateTimeout: 2000
+            }
+        })
+
         server.state('user', {
             ttl: 1000 * 60 * 60 * 24 *7,
             isSecure: process.env.NODE_ENV === 'prod',
@@ -40,7 +49,7 @@ async function init () {
         })
 
         server.ext('onPreResponse', site.fileNotFound)
-        
+
         server.route(routes)
 
         await server.start()
