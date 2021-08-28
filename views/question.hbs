@@ -2,6 +2,11 @@
   <div class="alert alert-primary" role="alert">
     <h4 class="alert-heading">{{question.title}}</h4>
     <p>{{question.description}}</p>
+    {{#with question.filename}}
+      <p>
+        <img style="max-width:80%" src="/assets/uploads/{{this}}" alt="" />
+      </p>
+    {{/with}}
     <p class="mb-0">Creada por <strong>{{question.owner.name}}</strong></p>
   </div>
   {{#each question.answers as |answer key|}}
@@ -42,6 +47,7 @@
               <label for="answer">Respuesta</label>
               <textarea class="form-control" id="answer" name="answer" placeholder="Ingrese la respuesta" required></textarea>
               <input type="hidden" name="id" value="{{key}}" />
+              <input type="hidden" name="crumb" value="{{crumb}}" />
             </div>
             <div class="text-center mt-5">
               <button type="submit" class="btn btn-primary">Enviar respuesta</button>

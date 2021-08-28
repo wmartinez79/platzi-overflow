@@ -1,13 +1,17 @@
 'use strict'
 
 const hapi = require('@hapi/hapi')
+const blankie = require('blankie')
+const crumb = require('@hapi/crumb')
 const handlebars = require('./lib/helpers')
 const inert = require('@hapi/inert')
+const good = require('@hapi/good')
 const methods = require('./lib/methods')
 const path = require('path')
 const routes = require('./routes')
 const vision = require('@hapi/vision')
 const site = require('./controllers/site')
+const { required } = require('@hapi/joi')
 
 const server = hapi.server({
     port: process.env.PORT || 3000,
@@ -23,6 +27,35 @@ async function init () {
     try {
         await server.register(inert)
         await server.register(vision)
+        await server.register({
+            plugin: good,
+            options: {
+                reporters: {
+                    console: [
+                        {
+                            module: require('@hapi/good-console')
+                        },
+                        'stdout'
+                    ]
+                }
+            }
+        })
+
+        await server.register({
+            plugin: crumb,
+            options: {
+                cookieOptions: {
+                    isSecure: process.env.NODE_ENV === 'prod'
+                }
+            }
+        })
+
+        await server.register({
+            plugin: require('./lib/api'),
+            options: {
+                prefix: 'api'
+            }
+        })
 
         server.method('setAnswerRight', methods.setAnswerRight)
         server.method('getLast', methods.getLast, {
@@ -57,15 +90,15 @@ async function init () {
         console.error(error)
         process.exit(1)
     }
-    console.log(`Servidor ejecutandose en ${server.info.uri}`)
+    server.log('info', `Servidor ejecutandose en ${server.info.uri}`)
 }
 
 process.on('unhandleRejection', error => {
-    console.error('UnhandleRejection', error.message, error)
+    server.error('UnhandleRejection', error)
 })
 
 process.on('unhandleException', error => {
-    console.error('UnhandleException', error.message, error)
+    server.error('UnhandleException', error)
 })
 
 init()
